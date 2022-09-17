@@ -1,5 +1,6 @@
 # 🫥 Anonymous Chat App
 
+[DEMO](https://jebong-chat.herokuapp.com/) 버전 보러가기
 - 간단한 익명 채팅 앱 만들기
 - nestjs, mvc pattern, socket.io
 
