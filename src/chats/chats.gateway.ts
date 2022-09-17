@@ -6,7 +6,7 @@ import {
 	WebSocketGateway,
 } from '@nestjs/websockets';
 
-@WebSocketGateway()
+@WebSocketGateway({ namespace: 'chattings' })
 export class ChatsGateway {
 	@SubscribeMessage('new_user')
 	handleNewUser(
