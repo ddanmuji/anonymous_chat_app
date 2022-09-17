@@ -34,7 +34,7 @@ const onSubmitChatForm = (event) => {
 
 	if (inputElement.value !== '') {
 		socket.emit('submit_chat', inputElement.value);
-		drawNewChat(`나: ${inputElement.value}`);
+		drawNewChat(`나: ${inputElement.value}`, true);
 		inputElement.value = '';
 	}
 };
@@ -53,12 +53,15 @@ const drawHelloStranger = (username) =>
  * */
 const drawNewChat = (message, isMe = false) => {
 	const wrapperChatBox = document.createElement('div');
-	let chatBox;
+	const className = `w-3/4 my-2 p-2 rounded-lg clearfix break-all ${
+		isMe ? 'bg-white  ml-auto mr-4' : 'bg-gray-300  mx-4'
+	}`;
 
-	if (isMe) chatBox = `<div>${message}</div>`;
-	else chatBox = `<div>${message}</div>`;
-
-	wrapperChatBox.innerHTML = chatBox;
+	wrapperChatBox.innerHTML = `
+    <div class="${className}">
+      ${message}
+    </div>
+  `;
 	chattingBoxElement.append(wrapperChatBox);
 };
 

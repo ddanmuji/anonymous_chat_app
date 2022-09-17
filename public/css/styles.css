@@ -1,3 +1,7 @@
 body {
-	background-color: #eee;
+	background-color: #333;
+}
+
+.bg_nest_color {
+	background-color: rgb(217, 19, 70);
 }

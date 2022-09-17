@@ -12,7 +12,7 @@ async function bootstrap() {
 	app.setViewEngine('hbs');
 	app.useGlobalPipes(new ValidationPipe());
 
-	await app.listen(8000);
+	await app.listen(process.env.PORT || 8000);
 }
 
 bootstrap();
