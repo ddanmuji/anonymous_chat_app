@@ -20,18 +20,22 @@ socket.on('new_chat', (data) => {
 	drawNewChat(`${username}: ${chat}`);
 });
 
+socket.on('disconnect_user', (username) =>
+	drawNewChat(`${username}님이 퇴장하셨습니다.`),
+);
+
 /**
  * @param {SubmitEvent} event
  * @description chat form submit 이벤트리스너
  */
 const onSubmitChatForm = (event) => {
 	event.preventDefault();
-	const chatInputElement = event.target.elements[0];
+	const inputElement = event.target.elements[0];
 
-	if (chatInputElement.value !== '') {
-		socket.emit('submit_chat', chatInputElement.value);
-		drawNewChat(`나: ${chatInputElement.value}`);
-		chatInputElement.value = '';
+	if (inputElement.value !== '') {
+		socket.emit('submit_chat', inputElement.value);
+		drawNewChat(`나: ${inputElement.value}`);
+		inputElement.value = '';
 	}
 };
 
@@ -43,19 +47,24 @@ const drawHelloStranger = (username) =>
 	(helloStrangerElement.innerText = `${username}님이 접속하셨습니다!`);
 
 /**
- * @prarm {string} message
+ * @param {string} message
+ * @param {boolean} isMe
  * @returns chatting_box 엘리먼트안에 채팅 기록 삽입
  * */
-const drawNewChat = (message) => {
+const drawNewChat = (message, isMe = false) => {
 	const wrapperChatBox = document.createElement('div');
-	const chatBox = `<div>${message}</div>`;
+	let chatBox;
+
+	if (isMe) chatBox = `<div>${message}</div>`;
+	else chatBox = `<div>${message}</div>`;
+
 	wrapperChatBox.innerHTML = chatBox;
 	chattingBoxElement.append(wrapperChatBox);
 };
 
 /** @returns namespace가 chattings인 곳에 username데이터를 new_user라는 이벤트로 emit */
 const helloUser = () => {
-	const username = prompt('이름을 입력해주세요');
+	const username = prompt('이름을 입력해주세요!');
 	socket.emit('new_user', username, (data) => {
 		drawHelloStranger(data);
 	});
