@@ -1,29 +1,71 @@
 const socket = io('/chattings');
+
+/** @param {string} id 해당 엘리먼트 id */
 const getElementById = (id) => document.getElementById(id) || null;
 
 const helloStrangerElement = getElementById('hello_stranger');
 const chattingBoxElement = getElementById('chatting_box');
 const chatFormElement = getElementById('chat_form');
 
-/** @description global socket handler */
+/**
+ * @param {string} username
+ * @description global socket handler
+ */
 socket.on('user_connected', (username) =>
-	console.log(`${username}님이 접속하셨습니다!`),
+	drawNewChat(`${username}님이 접속하셨습니다!`),
 );
 
-/** @returns hello_stranger 엘리먼트에 해당내용 삽입 */
+socket.on('new_chat', (data) => {
+	const { chat, username } = data;
+	drawNewChat(`${username}: ${chat}`);
+});
+
+/**
+ * @param {SubmitEvent} event
+ * @description chat form submit 이벤트리스너
+ */
+const onSubmitChatForm = (event) => {
+	event.preventDefault();
+	const chatInputElement = event.target.elements[0];
+
+	if (chatInputElement.value !== '') {
+		socket.emit('submit_chat', chatInputElement.value);
+		drawNewChat(`나: ${chatInputElement.value}`);
+		chatInputElement.value = '';
+	}
+};
+
+/**
+ * @param {string} username
+ * @returns hello_stranger 엘리먼트에 해당내용 삽입
+ */
 const drawHelloStranger = (username) =>
-	(helloStrangerElement.innerText = `Hello ${username} Stranger :)`);
+	(helloStrangerElement.innerText = `${username}님이 접속하셨습니다!`);
+
+/**
+ * @prarm {string} message
+ * @returns chatting_box 엘리먼트안에 채팅 기록 삽입
+ * */
+const drawNewChat = (message) => {
+	const wrapperChatBox = document.createElement('div');
+	const chatBox = `<div>${message}</div>`;
+	wrapperChatBox.innerHTML = chatBox;
+	chattingBoxElement.append(wrapperChatBox);
+};
 
 /** @returns namespace가 chattings인 곳에 username데이터를 new_user라는 이벤트로 emit */
-function helloUser() {
+const helloUser = () => {
 	const username = prompt('이름을 입력해주세요');
 	socket.emit('new_user', username, (data) => {
 		drawHelloStranger(data);
 	});
-}
+};
 
-function init() {
+const init = () => {
 	helloUser();
-}
+
+	/** @description 이벤트 연결 */
+	chatFormElement.addEventListener('submit', onSubmitChatForm);
+};
 
 init();
