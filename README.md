@@ -1,7 +1,7 @@
 # 🫥 Anonymous Chat App
 
 - 간단한 익명 채팅 앱 만들기
-- nestjs, mvc pattern, web socket
+- nestjs, mvc pattern, socket.io
 
 <br />
 
@@ -35,9 +35,67 @@ socket을 그냥 사용하게 되면 데이터가 모든 socket으로 들어가�
 
 <br />
 
-### gateway lifecycle
+### 게이트웨이 Lifecycle hooks
 
-gateway lifecycle
+nestjs는 3가지의 `lifecycle hooks`을 사용할 수 있게 제공한다.
+
+#### OnGatewayInit
+
+- `afterInit()`메서드를 필수로 구현해야 하며, 라이브러리 특정 서버 인스턴스를 인수로 사용한다.
+- 필요한 경우 나머지를 확산시킨다.
+- `afterInit()`는 게이트 웨이가 실행되고 **가장 먼저 실행**되는 메서드이다.
+```ts
+@WebSocketGateway()
+export class ChatsGateway implements OnGatewayInit {
+  private logger = new Logger('test');
+
+  afterInit() {
+    this.logger.log('init');
+  }
+
+  //...
+}
+```
+
+#### OnGatewayConnection
+
+- `handleConnection()`메서드를 필수로 구현해야 하며, 라이브러리 특정 클라이언트 소켓 인스턴스를 인수로 사용한다.
+- `handleConnection()`는 **connection이 되자마자 실행**되는 메서드 이다.
+
+```ts
+@WebSocketGateway()
+export class ChatsGateway implements OnGatewayConnection {
+  private logger = new Logger('test');
+
+  handleConnection(@ConnectedSocket() socket: Socket) {
+    this.logger.log(`connect id: ${socket.id} namespace: ${socket.nsp.name}`);
+  }
+
+  //...
+}
+```
+
+#### OnGatewayDisconnect
+
+- `handleDisconnect()`메서드를 구현해야 하며, 라이브러리 특정 클라이언트 소켓 인스턴스를 인수로 사용한다.
+- `handleDisconnect()`는 **client와 server의 연결이 끊겼을 때 실행**되는 메서드 이다.
+
+<br />
+
+```ts
+@WebSocketGateway()
+export class ChatsGateway implements OnGatewayDisconnect {
+  private logger = new Logger('test');
+
+  handleDisconnect(@ConnectedSocket() socket: Socket) {
+    this.logger.log(
+      `disConnect id: ${socket.id} namespace: ${socket.nsp.name}`,
+    );
+  }
+
+  //...
+}
+```
 
 <br />
 
