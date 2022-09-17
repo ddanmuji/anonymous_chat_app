@@ -57,6 +57,8 @@ export class ChatsGateway implements OnGatewayInit {
 }
 ```
 
+<br />
+
 #### OnGatewayConnection
 
 - `handleConnection()`메서드를 필수로 구현해야 하며, 라이브러리 특정 클라이언트 소켓 인스턴스를 인수로 사용한다.
@@ -74,6 +76,8 @@ export class ChatsGateway implements OnGatewayConnection {
   //...
 }
 ```
+
+<br />
 
 #### OnGatewayDisconnect
 
@@ -101,7 +105,25 @@ export class ChatsGateway implements OnGatewayDisconnect {
 
 ### 브로드캐스팅
 
-브로드캐스팅
+- 연결된 모든 client들에게 데이터를 한 번에 전송이 필요할 때 브로드캐스팅 이라는 이벤트를 사용하게 된다.
+- server에서 브로드캐스팅 이벤트를 등록하며 해당 이벤트가 발생 시 연결된 `모든 socket들에게도 새로운 정보를 전송`하게 된다.
+
+```ts
+@WebSocketGateway()
+export class ChatsGateway {
+  //...
+
+  @SubscribeMessage('new_user')
+  handleNewUser(@MessageBody() username: string, @ConnectedSocket() socket: Socket) {
+    /** 
+     * @description user_connected 라는 브로드캐스팅 이벤트를 등록 
+     * @description 새 client 에서 socket이 연결될 때 마다 연결된 모든 client에게 데이터 전송
+    */
+    socket.broadcast.emit('user_connected', username);
+    return username;
+  }
+}
+```
 
 <br />
 
